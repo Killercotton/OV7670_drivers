@@ -1,0 +1,19 @@
+pin connections OV7670
+3V3 
+GND -> GND
+SIOC -> PB8 -> IO8
+SIOD -> PB9 -> IO7
+VSYNC -> PB7(DCMI_VSYNC) -> STM_UART_RX (alternative PG9?, only available on silicon revision 3; alternative PI5)
+HREF -> PA4 -> SEN5 
+PCLK -> PA6 -> SEN7
+XCLK -> PA8 -> IO21
+D7 -> PE6 -> IO6
+D6 -> PE5 -> IO5
+D5 -> PB6(DCMI_D5) -> STM_UART_TX (alternative PD3)
+D4 -> PE4 -> IO4
+D3 -> PE1 -> IO1
+D2 -> PE0 -> IO0
+D1 -> PC7 -> IO22
+D0 -> PC6 -> IO23
+RESET -> PA10 -> IO19
+PWDN -> PB5 -> IO9
