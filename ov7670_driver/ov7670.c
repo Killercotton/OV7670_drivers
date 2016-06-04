@@ -19,6 +19,7 @@ static const uint8_t default_regs[][2] = {
     {COM7, COM7_RESET},
 	{TSLB,  0x04},	/* OV */
 	{COM7, 0},	/* VGA */
+	{CLKRC, 0x01},
 	/*
 	 * Set the hardware window.  These values from OV don't entirely
 	 * make sense - hstop is less than hstart.  But they work...
@@ -29,9 +30,9 @@ static const uint8_t default_regs[][2] = {
 
 	{COM3, 0},	{COM14, 0},
 	/* Mystery scaling numbers */
-	{0x70, 0x3a},		{0x71, 0x35},
-	{0x72, 0x11},		{0x73, 0xf0},
-	{0xa2,/* 0x02 changed to 1*/1},
+	{SCALING_XSC, 0x3a},		{SCALING_YSC, 0x35},
+	{SCALING_DCWCTR, 0x11},		{SCALING_PCLK_DIV, 0xf0},
+	{SCALING_PCLK_DELAY,/* 0x02 changed to 1*/1},
 	{COM10, COM10_VSYNC_NEG},
 	/* Gamma curve values */
 	{0x7a, 0x20},		{0x7b, 0x10},
@@ -125,6 +126,36 @@ static const uint8_t default_regs[][2] = {
 	{0xff, 0xff},	/* END MARKER */
 };
 
+static const uint8_t VGA_regs[][2] = {
+	{COM3, 0x00},
+	{COM14, 0x00},
+	{SCALING_XSC, 0x3A},
+	{SCALING_YSC, 0x35},
+	{SCALING_DCWCTR, 0x11},
+	{SCALING_PCLK_DIV, 0xF0},
+	{SCALING_PCLK_DELAY, 0x02}
+};
+
+static const uint8_t QVGA_regs[][2] = {
+	{COM3, 0x04},
+	{COM14, 0x19},
+	{SCALING_XSC, 0x3A},
+	{SCALING_YSC, 0x35},
+	{SCALING_DCWCTR, 0x11},
+	{SCALING_PCLK_DIV, 0xF1},
+	{SCALING_PCLK_DELAY, 0x02}
+};
+
+static const uint8_t QQVGA_regs[][2] = {
+	{COM3, 0x04},
+	{COM14, 0x1A},
+	{SCALING_XSC, 0x3A},
+	{SCALING_YSC, 0x35},
+	{SCALING_DCWCTR, 0x22},
+	{SCALING_PCLK_DIV, 0xF2},
+	{SCALING_PCLK_DELAY, 0x02}
+};
+
 #define NUM_BRIGHTNESS_LEVELS (9)
 static const uint8_t brightness_regs[NUM_BRIGHTNESS_LEVELS][2] = {
     {0x38, 0x0e}, /* -4 */
@@ -191,14 +222,16 @@ static int set_pixformat(sensor_t *sensor, pixformat_t pixformat)
     int ret=0;
     // Read register COM7
     uint8_t reg = SCCB_Read(sensor->slv_addr, COM7);
-
+	uint8_t reg2 = SCCB_Read(sensor->slv_addr, COM15);
     switch (pixformat) {
         case PIXFORMAT_RGB565:
             reg =  COM7_SET_FMT(reg, COM7_FMT_RGB);
+			reg2 = COM15_RGB565(reg2, 1);
             break;
         case PIXFORMAT_YUV422:
         case PIXFORMAT_GRAYSCALE:
             reg =  COM7_SET_FMT(reg, COM7_FMT_YUV);
+			reg2 = COM15_RGB565(reg2, 0);
             break;
         default:
             return -1;
@@ -206,7 +239,7 @@ static int set_pixformat(sensor_t *sensor, pixformat_t pixformat)
 
     // Write back register COM7
     ret = SCCB_Write(sensor->slv_addr, COM7, reg);
-
+	ret = reg | SCCB_Write(sensor->slv_addr, COM15, reg2);
     // Delay
     systick_sleep(30);
 
@@ -215,23 +248,31 @@ static int set_pixformat(sensor_t *sensor, pixformat_t pixformat)
 
 static int set_framesize(sensor_t *sensor, framesize_t framesize)
 {
-    /*int ret=0;
-    uint16_t w = resolution[framesize][0];
-    uint16_t h = resolution[framesize][1];
-
-    // Write MSBs
-    ret |= SCCB_Write(sensor->slv_addr, HOUTSIZE, w>>2);
-    ret |= SCCB_Write(sensor->slv_addr, VOUTSIZE, h>>1);
-
-    // Write LSBs
-    ret |= SCCB_Write(sensor->slv_addr, EXHCH, ((w&0x3) | ((h&0x1) << 2)));
-
-    // Delay
-    systick_sleep(30);
-
-    return ret;
-*/
-return 0;
+	int ret=0;
+	switch(framesize)
+	{
+		case 0:
+			for (i=0, regs = VGA_regs; regs[i][0]; i++) 
+			{
+			ret |= SCCB_Write(sensor->slv_addr, regs[i][0], regs[i][1]);
+			}
+			break;
+		case 1:
+			for (i=0, regs = QVGA_regs; regs[i][0]; i++) 
+			{
+			ret |= SCCB_Write(sensor->slv_addr, regs[i][0], regs[i][1]);
+			}
+			break;
+		case 2:
+			for (i=0, regs = QQVGA_regs; regs[i][0]; i++) 
+			{
+			ret |= SCCB_Write(sensor->slv_addr, regs[i][0], regs[i][1]);
+			}
+			break;
+		default:
+			return -1;
+	}
+	return ret;
 }
 
 static int set_framerate(sensor_t *sensor, framerate_t framerate)

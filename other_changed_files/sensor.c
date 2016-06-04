@@ -39,17 +39,10 @@ static int line = 0;
 extern uint8_t _line_buf;
 
 const int resolution[][2] = {
-    {88,    72 },    /* QQCIF */
+   
     {160,   120},    /* QQVGA */
-    {128,   160},    /* QQVGA2*/
-    {176,   144},    /* QCIF  */
-    {240,   160},    /* HQVGA */
     {320,   240},    /* QVGA  */
-    {352,   288},    /* CIF   */
     {640,   480},    /* VGA   */
-    {800,   600},    /* SVGA  */
-    {1280,  1024},   /* SXGA  */
-    {1600,  1200},   /* UXGA  */
 };
 
 static int extclk_config(int frequency)

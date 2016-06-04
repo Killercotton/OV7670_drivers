@@ -81,9 +81,9 @@
 #define COM7_FMT_RGB444         0x0C /* RGB output format RGB444 */
 #define COM7_FMT_YUV            0x00 /* Output format YUV        */
 #define COM7_FMT_P_BAYER        0x01 /* Output format Processed Bayer RAW */
-#define COM7_FMT_RGB            0x02 /* Output format RGB        */
+#define COM7_FMT_RGB            0x04 /* Output format RGB        */
 #define COM7_FMT_R_BAYER        0x03 /* Output format Bayer RAW  */
-#define COM7_SET_FMT(r, x)      ((r&0xFC)|((x&0x3)<<0))
+#define COM7_SET_FMT(r, x)      ((r&0xFC)|((x&0x5)<<0))
 
 #define COM8                    0x13 /* Common Control 8                */
 #define COM8_FAST_AUTO          0x80 /* Enable fast AGC/AEC algorithm   */
@@ -181,6 +181,7 @@
 
 #define EDGE                    0x3F /* edge enhancement adjustment */
 #define COM15                   0x40 /* Common Control 15 DIFFERENT CONTROLS */
+#define COM15_SET_RGB565(r,x)	((r&EF)|((x&1)<<4)) /* set rgb565 mode */
 #define COM16                   0x41 /* Common Control 16 DIFFERENT CONTROLS */
 #define COM16_AWBGAIN		0x08	/* AWB gain enable */
 #define COM17                   0x42 /* Common Control 17   */
