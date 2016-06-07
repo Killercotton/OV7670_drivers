@@ -230,11 +230,10 @@ static int set_pixformat(sensor_t *sensor, pixformat_t pixformat)
             break;
         case PIXFORMAT_YUV422:
         case PIXFORMAT_GRAYSCALE:
+	default:
             reg =  COM7_SET_FMT(reg, COM7_FMT_YUV);
 	    reg2 = COM15_SET_RGB565(reg2, 0);
             break;
-        default:
-            return -1;
     }
 
     // Write back register COM7
