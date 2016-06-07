@@ -250,23 +250,22 @@ static int set_framesize(sensor_t *sensor, framesize_t framesize)
 {
 	const uint8_t (*regs)[2];
 	int ret=0;
-	int i=0;
 	switch(framesize)
 	{
 		case 0:
-			for (i=0, regs = VGA_regs; regs[i][0]; i++) 
+			for (int i=0, regs = VGA_regs; regs[i][0]; i++) 
 			{
 				ret |= SCCB_Write(sensor->slv_addr, regs[i][0], regs[i][1]);
 			}
 			break;
 		case 1:
-			for (i=0, regs = QVGA_regs; regs[i][0]; i++) 
+			for (int i=0, regs = QVGA_regs; regs[i][0]; i++) 
 			{
 				ret |= SCCB_Write(sensor->slv_addr, regs[i][0], regs[i][1]);
 			}
 			break;
 		case 2:
-			for (i=0, regs = QQVGA_regs; regs[i][0]; i++) 
+			for (int i=0, regs = QQVGA_regs; regs[i][0]; i++) 
 			{
 				ret |= SCCB_Write(sensor->slv_addr, regs[i][0], regs[i][1]);
 			}
